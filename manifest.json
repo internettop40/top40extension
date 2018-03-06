@@ -3,7 +3,7 @@
 
   "name": "internettop40.com Extension",
   "description": "Browser extension for internettop40.com",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "background": {
     "scripts": [
       "background/background.js"
