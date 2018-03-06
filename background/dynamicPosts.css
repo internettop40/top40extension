@@ -1,0 +1,18 @@
+.embed-collapse {
+  padding: 5px 5px !important;
+  position: relative;
+  width: 100%;
+  height: -moz-available;
+  height: -webkit-fill-available;
+  height: fill-available;
+}
+
+.embed-collapse iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: -moz-available;
+  height: -webkit-fill-available;
+  height: fill-available;
+}

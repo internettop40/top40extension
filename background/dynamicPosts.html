@@ -1,0 +1,114 @@
+<!DOCTYPE html><html>
+  <head>
+    <title>INTERNET TOP 40</title>
+    <link rel="stylesheet" href="dynamicPosts.css" />
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="open-iconic-master/font/css/open-iconic-bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap-datepicker/css/bootstrap-datepicker.min.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">My Top40 Lists</a>
+    </nav>
+    <div class="container" style="border: 1px solid #eee; background: #f9f9f9; margin: 1px; max-width: 100%;">
+      <form id="searchForm" class="collapse">
+        <br/>
+        <div class="form-group">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend" style="z-index: 999;">
+              <span class="input-group-text">List Type</span>
+            </div>
+            <select class="form-control" id="postTypeFilter" style="left: -2px;">
+              <option value="youtube:youtube-top40" selected>Youtube - All</option>
+              <option value="youtube:youtube-top40-music-for">Youtube - Music Videos</option>
+              <option value="youtube:youtube-top40-for">Youtube - Other</option>
+            </select>
+          </div>
+        </div>
+        <!-- filter for friends -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="searchFormCheckbox" id="filterFriendsCheckbox" value="filterFriends" checked>
+          <label for="filterFriendsCheckbox">List by friends</label>
+          <select multiple class="form-control" id="friendsFilterType">
+          </select>
+        </div>
+        <!-- filter for location -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="searchFormCheckbox" id="filterLocationCheckbox" value="filterLocation">
+          <label for="locationFilterType">List by location</label>
+          <select class="form-control" id="locationFilterType">
+            <option value="Country">Country</option>
+            <option value="Region">State/Region</option>
+            <option value="City">City</option>
+          </select>
+          <br/>
+          <!-- selections for country-->
+          <select class="form-control locationFilterSelections" id="locationFilterCountry" disabled>
+            <option value="-1">loading...</option>
+          </select>
+          <!-- selections for region -->
+          <select class="form-control locationFilterSelections" id="locationFilterRegion" style="display: none;" disabled>
+            <option value="-1">loading...</option>
+          </select>
+          <!-- selections for city-->
+          <select class="form-control locationFilterSelections" id="locationFilterCity" style="display: none;" disabled>
+            <option value="-1">loading...</option>
+          </select>
+        </div>
+        <div class="form-check" style="margin-top: 5px;">
+          <label for="dateFilterType">Date between:</label>
+          <div class="input-daterange input-group" id="datepicker">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="start-addon"><img width="16px" src="open-iconic-master/svg/calendar.svg"></span>
+              </div>
+              <input type="text" id="startDate" class="input-sm form-control" placeholder="add start" name="start" value="2/2/2018" aria-describedby="start-addon" />
+
+              <span class="input-group-addon" style='margin: 0px 5px;'>to</span>
+
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="end-addon"><img width="16px" src="open-iconic-master/svg/calendar.svg"></span>
+              </div>
+              <input type="text" id="endDate" class="input-sm form-control" placeholder="add end" name="end" aria-describedby="end-addon" />
+          </div>
+        </div>
+        <hr/>
+      </form>
+      <div class="text-center" style="">
+        <button style="margin: 0px 0px 10px 0px;" id="getListBtn" class="btn btn-primary btn-sm" type="submit" disabled>
+          Get List
+        </button>
+        <button style="margin: 0px 0px 10px 0px;" id="hideFilterBtn" class="btn btn-secondary btn-sm" >
+          Hide Filters
+        </button>
+        <button style="margin: 5px 0px 10px 0px; display: none;" id="showFilterBtn" class="btn btn-secondary btn-sm" type="button">
+          Show Filters
+        </button>
+      </div>
+  </div>
+  <div style="display: none; margin-top: 3px;" id="results">
+  </div>
+
+  <div class="container" class="text-center" style="margin-top: 30px; display: none;" id="loading">
+    <br/>
+    <p class="text-center" id="loadingSpinner"></p>
+    <br/>
+    <p class="text-center">Loading list...</p>
+  </div>
+
+  <nav id="paginator" style="margin-top: 5px; display: none;">
+    <ul class="pagination justify-content-center">
+    </ul>
+  </nav>
+
+  </body>
+  <script src="jquery-3.2.1.min.js"></script>
+  <script src="moment.min.js"></script>
+  <script src="bootstrap/bootstrap.min.js"></script>
+  <script src="bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+  <script src="spin.js"></script>
+  <script src="spin.jquery.js"></script>
+  <script src="../content/main.js"></script>
+  <script src="../content/geolocation.js"></script>
+  <script src="../content/youtube.js"></script>
+  <script src="dynamicPosts.js"></script>
+</html>

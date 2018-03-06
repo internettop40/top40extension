@@ -1,0 +1,37 @@
+{
+  "manifest_version": 2,
+
+  "name": "internettop40.com Extension",
+  "description": "Browser extension for internettop40.com",
+  "version": "1.0.10",
+  "background": {
+    "scripts": [
+      "background/background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": [
+        "content/jquery-3.2.1.min.js",
+        "content/geolocation.js",
+        "content/main.js"
+      ]
+    },
+    {
+      "matches": ["http://www.youtube.com/*", "https://www.youtube.com/*"],
+      "js": [
+        "content/youtube.js"
+      ]
+    }
+  ],
+  "browser_action": {
+   "default_icon": "icon.png",
+   "default_popup": "popup.html"
+  },
+  "permissions": [
+    "tabs", "http://*/*", "https://*/*",
+    "*://*.youtube.com/*"
+  ],
+  "content_security_policy": "script-src 'self' https://www.youtube.com https://*.ytimg.com; object-src 'self'"
+}
