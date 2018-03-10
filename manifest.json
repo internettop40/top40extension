@@ -3,7 +3,7 @@
 
   "name": "internettop40.com Extension",
   "description": "Browser extension for internettop40.com",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "background": {
     "scripts": [
       "background/background.js"
@@ -14,6 +14,7 @@
       "matches": ["http://*/*", "https://*/*"],
       "js": [
         "content/jquery-3.2.1.min.js",
+        "content/cookie.js",
         "content/geolocation.js",
         "content/main.js"
       ]
@@ -22,6 +23,12 @@
       "matches": ["http://www.youtube.com/*", "https://www.youtube.com/*"],
       "js": [
         "content/youtube.js"
+      ]
+    },
+    {
+      "matches": ["http://www.internettop40.com/*", "https://www.internettop40.com/*"],
+      "js": [
+        "content/top40.js"
       ]
     }
   ],
