@@ -54,7 +54,6 @@ var news = (function() {
 
       newsData = parsedData;
       newsData.newsUrl = urlInfo.url;
-      console.log(newsData);
 
       resolve(newsData);
     });
@@ -65,7 +64,7 @@ var news = (function() {
   module.buildPostContent = function (payloadData) {
     return "<div class='top40-news-wrapper'>" +
               "<div class='top40-news-image'>" +
-                "<img src='" + payloadData.newsImageUrl + "'>"
+                "<img src='" + payloadData.newsImageUrl + "' />" +
               "</div>" +
               payloadData.newsContent +
            "</div>";
@@ -96,7 +95,7 @@ var news = (function() {
   }
 
   module.sendData = function (payload) {
-    /*$(function() {
+    $(function() {
       $.ajax({
         type: 'POST',
         url: main.base_url + '/add_post/',
@@ -109,7 +108,7 @@ var news = (function() {
           console.log(data);
         }
       });
-    });*/
+    });
     module.addRead(payload.data.newsId);
   };
 
