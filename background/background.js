@@ -1,16 +1,16 @@
-var browser = browser == null ? chrome : browser;
+var dialogTabId = null;
 
 // trigger faster update!
 function requestUpdate() {
   if (navigator.userAgent.search("Chrome") != -1) {
-    browser.runtime.requestUpdateCheck(function(status) {
+    chrome.runtime.requestUpdateCheck(function(status) {
       if (status == "update_available") {
-          browser.runtime.reload();
+          chrome.runtime.reload();
         }
     });
-  } else {
-    browser.runtime.onUpdateAvailable.addListener(function(details) {
-      browser.runtime.reload();
+  } else if (navigator.userAgent.search("Mozilla") != -1 || navigator.userAgent.search("Firefox") != -1) {
+    chrome.runtime.onUpdateAvailable.addListener(function(details) {
+      chrome.runtime.reload();
     });
   }
 }
@@ -21,14 +21,13 @@ setInterval(function(){ requestUpdate(); }, 60000);
 function detectUrlChange() {
   //Listen for when a Tab changes state
   var prevUrl = '';
-  browser.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
+  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
       // to prevent duplicate entries caused by double changeInfo events
       var urlSeen = {};
-
       if(changeInfo && changeInfo.status == "complete" && tab.url !== prevUrl && !urlSeen[tab.url]){
         urlSeen[tab.url] = true;
         prevUrl = tab.url;
-        browser.tabs.sendMessage(tabId, {data: tab}, function(response) {});
+        chrome.tabs.sendMessage(tabId, {data: tab}, function(response) {});
         setTimeout(function() { delete(urlSeen[tab.url]); }, 3000);
       }
   });
@@ -36,7 +35,7 @@ function detectUrlChange() {
 
 detectUrlChange();
 
-browser.runtime.onMessage.addListener(function(message,sender,sendResponse){
+chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
   var timeNow = (new Date().getTime()) / 1000; // current unixtime in seconds
 
   if (message.type == 'setLocation') {
@@ -61,28 +60,35 @@ browser.runtime.onMessage.addListener(function(message,sender,sendResponse){
         return;
       }
 
-      browser.tabs.create({
-          url: browser.extension.getURL('background/dialog.html'),
+      chrome.tabs.create({
+          url: chrome.extension.getURL('background/dialog.html'),
           active: true
+      }, function (dialogTab) {
+        dialogTabId = dialogTab.id;
       });
   } else if (message.type === 'getEmailOrId') {
     sendResponse(localStorage.getItem('email_or_id'));
-  } else if (message.type === 'getVideosWatched') {
-    var videosWatched = JSON.parse(localStorage.getItem('videos-watched') || '{}');
-    sendResponse(videosWatched);
-  } else if (message.type === 'updateVideosWatched') {
-    var videosWatched = message.data;
-    localStorage.setItem('videos-watched', JSON.stringify(videosWatched));
+  } else if (
+    message.type === 'getVideosWatched' ||
+    message.type === 'getNewsRead'
+  ) {
+    var info = JSON.parse(localStorage.getItem(message.key) || '{}');
+    sendResponse(info);
+  } else if (
+    message.type === 'updateVideosWatched' ||
+    message.type === 'updateNewsRead'
+  ) {
+    localStorage.setItem(message.key, JSON.stringify(message.data));
   } else if (message.type === 'openDynamicPosts') {
     openDynamicPosts();
   }
 });
 
 function openDynamicPosts () {
-  browser.windows.getCurrent(function(w) {
+  chrome.windows.getCurrent(function(w) {
     // create the tab,
-    browser.tabs.create({
-        url: browser.extension.getURL('background/dynamicPosts.html'),
+    chrome.tabs.create({
+        url: chrome.extension.getURL('background/dynamicPosts.html'),
         active: true
     });
   });
@@ -92,3 +98,13 @@ function setEmailOrId(email_or_id) {
     // Do something, eg..:
     localStorage.setItem('email_or_id', email_or_id);
 };
+
+function closeDialogWindow() {
+  if (dialogTabId != null) {
+    chrome.tabs.get(dialogTabId, function (tab) {
+      if (tab.url.search("dialog.html") != -1) {
+        chrome.tabs.remove(tab.id);
+      }
+    });
+  }
+}

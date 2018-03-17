@@ -1,5 +1,3 @@
-var browser = browser == null ? chrome : browser;
-
 var geolocation = (function () {
   var module = {
     location: {
@@ -17,7 +15,7 @@ var geolocation = (function () {
    */
   module.getLocationInfo = function (callbackFn) {
     module.callbackFn = callbackFn;
-    browser.runtime.sendMessage({type: "getLocation"}, function(response) {
+    chrome.runtime.sendMessage({type: "getLocation"}, function(response) {
       if (Object.keys(response.data).length > 0) {
         module.location = response.data;
         if (module.callbackFn) {
@@ -170,7 +168,7 @@ var geolocation = (function () {
       module.location.postal = postal;
       module.location.found = true;
 
-      browser.runtime.sendMessage({type: "setLocation", data: module.location}, function(response) {
+      chrome.runtime.sendMessage({type: "setLocation", data: module.location}, function(response) {
         //console.log(response.farewell);
       });
 

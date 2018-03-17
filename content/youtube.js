@@ -1,5 +1,3 @@
-var browser = browser == null ? chrome : browser;
-
 var youtube = (function () {
   var module = {
     watchVideoInterval: 5000,
@@ -30,7 +28,7 @@ var youtube = (function () {
           console.log('error');
         });
       }, module.watchVideoInterval);
-    };
+    }
     geolocation.getLocationInfo(getUserLocation);
   };
 
@@ -115,7 +113,7 @@ var youtube = (function () {
   module.alreadyWatched = function(videoId) {
     var promise = new Promise(function(resolve, reject) {
       // getVideosWatched must return { videoId: {videoId: "asdf", expirationTime: 12345} }
-      browser.runtime.sendMessage({type: "getVideosWatched"}, function(response) {
+      chrome.runtime.sendMessage({type: "getVideosWatched", key: "videos-watched"}, function(response) {
         var videosWatched = response;
 
         var watchInfo = videosWatched[videoId];
@@ -130,7 +128,7 @@ var youtube = (function () {
         if (expirationTime && expirationTime < timeNow) {
           // then we need to remove this item
           delete(videosWatched[videoId]);
-          browser.runtime.sendMessage({type: "updateVideosWatched", data: videosWatched});
+          chrome.runtime.sendMessage({type: "updateVideosWatched", data: videosWatched, key: "videos-watched"});
           resolve(false);
         } else {
           resolve(true);
@@ -142,7 +140,7 @@ var youtube = (function () {
 
   module.addWatched = function(videoId) {
     // getVideosWatched must return { videoId: {videoId: "asdf", expirationTime: 12345} }
-    browser.runtime.sendMessage({type: "getVideosWatched"}, function(response) {
+    chrome.runtime.sendMessage({type: "getVideosWatched", key: "videos-watched"}, function(response) {
       // first of all, clean up expired videos before adding new one
       var videosWatched = module.cleanUpWatched(response);
 
@@ -154,7 +152,7 @@ var youtube = (function () {
         "expirationTime": expirationTime
       };
       videosWatched[videoId] = watchInfo;
-      browser.runtime.sendMessage({type: "updateVideosWatched", data: videosWatched});
+      chrome.runtime.sendMessage({type: "updateVideosWatched", data: videosWatched, key: "videos-watched"});
     });
   };
 

@@ -1,5 +1,3 @@
-var browser = browser == null ? chrome : browser;
-
 var main = (function () {
   var module = {
     run_mode: 'prod',//'staging',
@@ -16,7 +14,7 @@ var main = (function () {
     function onUrlChange (request, sender, sendResponse) {
         cb();
     }
-    browser.runtime.onMessage.addListener(onUrlChange);
+    chrome.runtime.onMessage.addListener(onUrlChange);
   }
 
   module.getUrlInfo = function () {
@@ -43,12 +41,12 @@ var main = (function () {
   }
 
   module.setUserEmailOrId = function () {
-    browser.runtime.sendMessage({type: 'setEmailOrId'});
+    chrome.runtime.sendMessage({type: 'setEmailOrId'});
   }
 
   module.getUserEmailOrId = function () {
     var promise = new Promise(function(resolve, reject) {
-      browser.runtime.sendMessage({type: "getEmailOrId"}, function(response) {
+      chrome.runtime.sendMessage({type: "getEmailOrId"}, function(response) {
         if (response == null) {
           module.setUserEmailOrId();
           reject();
@@ -61,11 +59,11 @@ var main = (function () {
   }
 
   module.openDynamicPosts = function () {
-    browser.runtime.sendMessage({type: 'openDynamicPosts'});
+    chrome.runtime.sendMessage({type: 'openDynamicPosts'});
   }
 
   module.addDynamicPostsButton = function () {
-    if (document.getElementById('dynamicPostsButton') != null) {
+    if ($('dynamicPostsButton').length > 0) {
       $('#dynamicPostsButton').remove();
     }
     var openDynamicPostsButton = "<button id='dynamicPostsButton'>My Top40 List</button>";

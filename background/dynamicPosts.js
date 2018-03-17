@@ -150,6 +150,8 @@ function getPostIds(filterData) {
       */
       if (data != null) {
         fetchPostInfo(Object.keys(data), data);
+      } else {
+        console.log('data is null!');
       }
     }
   });
@@ -545,7 +547,7 @@ function buildYoutubeDisplay(postInfo, parentInfoList, rank) {
 
 function load_youtube_iframe_api() {
   var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
+  tag.src = "iframe_api.js";
   var firstScriptTag = document.getElementsByTagName('script')[0];
   firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 }
