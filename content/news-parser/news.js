@@ -45,7 +45,31 @@ var news = (function() {
           parsedData = yahooParser.parseData(urlInfo);
           break;
         case 'www.huffingtonpost.com':
-          parsedData = {};
+          parsedData = huffingtonParser.parseData(urlInfo);
+          break;
+        case 'www.cnn.com':
+          parsedData = cnnParser.parseData(urlInfo);
+          break;
+        case 'www.nytimes.com':
+          parsedData = nytimesParser.parseData(urlInfo);
+          break;
+        case 'www.foxnews.com':
+          parsedData = foxParser.parseData(urlInfo);
+          break;
+        case 'www.nbcnews.com':
+          parsedData = nbcParser.parseData(urlInfo);
+          break;
+        case 'www.dailymail.co.uk':
+          parsedData = dailymailParser.parseData(urlInfo);
+          break;
+        case 'www.theguardian.com':
+          parsedData = guardianParser.parseData(urlInfo);
+          break;
+        case 'www.wsj.com':
+          parsedData = wsjParser.parseData(urlInfo);
+          break;
+        case 'abcnews.go.com':
+          parsedData = abcParser.parseData(urlInfo);
           break;
         default:
           parsedData = {};

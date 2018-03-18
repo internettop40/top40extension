@@ -306,7 +306,6 @@ function fetchPostInfoHelper(post_info_list, post_view_counts) {
       parent_post_exists[parent_post_id] = true;
     }
   }
-
   $.ajax({
     type: 'POST',
     url: main.base_url + '/get_posts_by_ids/',
@@ -369,6 +368,10 @@ function displayPostInfo(data, parent_data, post_view_counts) {
 
     if (/^youtube-/.test(postName)) {
       var displayInfo = buildYoutubeDisplay(postInfo, parent_data, i+1);
+    } else if(/^top40-news-/.test(postName)) {
+      var displayInfo = buildNewsDisplay(postInfo, parent_data, i+1);
+    }
+    if (/^youtube-/.test(postName) || /^top40-news-/.test(postName)) {
       curPage = parseInt(displayCount / itemsPerPage);
       // put results in the lists by page
       if (!(curPage in listsByPage)) {
@@ -401,7 +404,7 @@ function displayPostInfo(data, parent_data, post_view_counts) {
     $('.collapse.embeds').on('show.bs.collapse', function () {
       var $cardBody = $(this).find('.card-body');
 
-      if (!$cardBody.html() || !$cardBody.html().length) {
+      if ((!$cardBody.html() || !$cardBody.html().length) && ("embed" in rankToDisplayInfo[rank])) {
         var rank = $(this).attr('rank');
         $cardBody.append(rankToDisplayInfo[rank]["embed"]);
         new YT.Player(rankToDisplayInfo[rank]["playerId"], {
@@ -530,7 +533,7 @@ function buildYoutubeDisplay(postInfo, parentInfoList, rank) {
                   "</tr></tbody></table>" +
                 "</div>" +
                 "<div id='collapse_" + rank + "' rank='" + rank + "' class='collapse embeds' aria-labelledby='heading_" + rank + "' data-parent='#results' style='padding: 10px;'>" +
-                  "<div class='card-body embed-collapse'>" +
+                  "<div class='card-body embed-collapse embed-collpase-iframe'>" +
                     // this is where embed goes!
                   "</div>" +
                 "</div>" +
@@ -543,6 +546,48 @@ function buildYoutubeDisplay(postInfo, parentInfoList, rank) {
       "videoId": videoId,
       "isMusicVideo": isMusicVideo
   };
+}
+
+function buildNewsDisplay(postInfo, parentInfoList, rank) {
+  var parentInfo = {};
+  for (var idx in parentInfoList) {
+    if (postInfo['post_parent'] === parentInfoList[idx]['ID']) {
+      parentInfo = parentInfoList[idx];
+    }
+  }
+  var newsId = postInfo['post_name'].split('top40-news-')[1];
+  var $postContent = $(postInfo['post_content']);
+  var newsUrl = $postContent.find('a').attr('href');
+  var thumbnailSrc = $postContent.find('img').attr('src');
+  var thumbnail = "<img src='" + thumbnailSrc + "' style='max-height: 90px'>";
+  var viewButton = "<button class='btn btn-secondary btn-sm' data-toggle='collapse' style='float: right; position: absolute; top: 20px; right: 8px;'" +
+                      " data-target='#collapse_" +
+                      rank + "' aria-expanded='true' aria-controls='collapse_" + rank + "'>" +
+                      "view" +
+                "</button>";
+  var viewCount = "<small><b>" + postInfo['view_count'] + "</b> views</small>";
+  var card = "<div class='card' style='margin: 0px 5px;'>" +
+                "<div class='card-header' style='padding: 0.1rem 0.5rem;' id='heading_" + rank + "'>" +
+                  "<table style='width: inherit;'><tbody><tr>" +
+                    "<td style='min-width: 50px;'><h5 style='margin-bottom: 0px; text-align: center;'>" +  "#" + rank + "</h5><div>" + viewCount + "</div></td>" +
+                    "<td padding-left: 5px;>" + thumbnail + "</td>" +
+                    "<td style='padding: 0px 10px; vertical-align: middle;'>" +
+                      "<div style='overflow: hidden;'><b>"
+                      +  postInfo['post_title'] + "</b></div>" +
+                    "</td>" +
+                    "<td style='min-width: 55px; vertical-align: middle;'>" +  viewButton + "</td>" +
+                  "</tr></tbody></table>" +
+                "</div>" +
+                "<div id='collapse_" + rank + "' rank='" + rank + "' class='collapse embeds' aria-labelledby='heading_" + rank + "' data-parent='#results' style='padding: 10px;'>" +
+                  "<div class='card-body embed-collapse'>" +
+                    postInfo['post_content'] +
+                  "</div>" +
+                "</div>" +
+             "</div>";
+   return {
+       "item": card,
+       "newsId": newsId
+   };
 }
 
 function load_youtube_iframe_api() {

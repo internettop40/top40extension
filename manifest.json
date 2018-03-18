@@ -42,14 +42,23 @@
         "http://www.washingtonpost.com/*", "https://www.washingtonpost.com/*",
         "http://www.theguardian.com/*", "https://www.theguardian.com/*",
         "http://www.wsj.com/*", "https://www.wsj.com/*",
-        "http://www.abcnews.go.com/*", "https://www.abcnews.go.com/*",
+        "http://abcnews.go.com/*", "https://abcnews.go.com/*",
         "http://news.bbc.co.uk/*", "https://news.bbc.co.uk/*",
         "http://www.usatoday.com/*", "https://www.usatoday.com/*",
         "http://www.latimes.com/*", "https://www.latimes.com/*"
       ],
       "js": [
         "content/news-parser/news.js",
-        "content/news-parser/sites/yahoo-parser.js"
+        "content/news-parser/sites/yahoo-parser.js",
+        "content/news-parser/sites/huffington-parser.js",
+        "content/news-parser/sites/cnn-parser.js",
+        "content/news-parser/sites/nytimes-parser.js",
+        "content/news-parser/sites/fox-parser.js",
+        "content/news-parser/sites/nbc-parser.js",
+        "content/news-parser/sites/dailymail-parser.js",
+        "content/news-parser/sites/guardian-parser.js",
+        "content/news-parser/sites/wsj-parser.js",
+        "content/news-parser/sites/abc-parser.js"
       ]
     }
   ],
