@@ -403,7 +403,7 @@ function displayPostInfo(data, parent_data, post_view_counts) {
 
     $('.collapse.embeds').on('show.bs.collapse', function () {
       var $cardBody = $(this).find('.card-body');
-
+      // do youtube stuff
       if ((!$cardBody.html() || !$cardBody.html().length) && ("embed" in rankToDisplayInfo[rank])) {
         var rank = $(this).attr('rank');
         $cardBody.append(rankToDisplayInfo[rank]["embed"]);
@@ -442,8 +442,19 @@ function displayPostInfo(data, parent_data, post_view_counts) {
         });
       }
     });
+
+    // convert each one of the anchor tags from loading in current screen to opening in new tab
+    $('.card-body a').each(function() {
+        $(this).click(function() {
+          var link = $(this).attr('href');
+          window.open(link);
+          return false;
+        });
+    });
   }
   $('#results').show();
+
+
 }
 
 function buildPagination(numPages) {

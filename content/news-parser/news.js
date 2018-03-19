@@ -71,6 +71,24 @@ var news = (function() {
         case 'abcnews.go.com':
           parsedData = abcParser.parseData(urlInfo);
           break;
+        case 'www.usatoday.com':
+          parsedData = usatodayParser.parseData(urlInfo);
+          break;
+        case 'www.wired.com':
+          parsedData = wiredParser.parseData(urlInfo);
+          break;
+        case 'www.nationalgeographic.com':
+          parsedData = natgeoParser.parseData(urlInfo);
+          break;
+        case 'news.nationalgeographic.com':
+          parsedData = natgeoParser.parseData(urlInfo);
+          break;
+        case 'www.sciencenews.org':
+          parsedData = sciencenewsParser.parseData(urlInfo);
+          break;
+        case 'www.msn.com':
+          parsedData = msnParser.parseData(urlInfo);
+          break;
         default:
           parsedData = {};
           break;

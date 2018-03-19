@@ -12,11 +12,14 @@ var cnnParser = (function() {
     var newsTitle = $('h1').text();
     var newsContent = '';
     var $article = $('article');
+    var paragraphLimit = 5;
     $article.find('p').each(function() {
-      newsContent += "<p>" + $(this).text() + "</p>";
+      if (paragraphLimit > 0) {
+        newsContent += "<p>" + $(this).text() + "</p>";
+        paragraphLimit--;
+      }
     });
-    newsContent += "<p>" + $article.find('p').first().text() + "</p>";
-    var newsLink = "<a href=\"" + urlInfo.url + "\">here</a>";
+    var newsLink = "<a class='news-link' href=\"" + urlInfo.url + "\">here</a>";
     newsContent += "<br/><p>... To Read more, please click " + newsLink + "</p>";
     var newsImageUrl = '';
     var $articleImage = $article.find('img.media__image');

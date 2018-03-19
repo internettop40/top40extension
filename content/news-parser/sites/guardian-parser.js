@@ -8,11 +8,14 @@ var guardianParser = (function() {
     var newsTitle = $('h1').text();
     var $article = $('article');
     var newsContent = '';
-    /*$article.find('p.canvas-text').each(function() {
-      newsContent += "<p>" + $(this).text() + "</p>";
-    });*/
-    newsContent += "<p>" + $article.find('div[itemprop="articleBody"] p').first().text() + "</p>";
-    var newsLink = "<a href=\"" + urlInfo.url + "\">here</a>";
+    var paragraphLimit = 5;
+    $article.find('div[itemprop="articleBody"] p').each(function() {
+      if (paragraphLimit > 0) {
+        newsContent += "<p>" + $(this).text() + "</p>";
+        paragraphLimit--;
+      }
+    });
+    var newsLink = "<a class='news-link' href=\"" + urlInfo.url + "\">here</a>";
     newsContent += "<br/><p>... To Read more, please click " + newsLink + "</p>";
     var newsImageUrl = '';
     var $articleImage = $article.find('figure img').first();

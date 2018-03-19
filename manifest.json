@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "internettop40.com Extension",
   "description": "Browser extension for internettop40.com",
-  "version": "1.0.22",
+  "version": "1.0.24",
   "background": {
     "scripts": [
       "background/background.js"
@@ -37,15 +37,19 @@
         "http://www.cnn.com/*", "https://www.cnn.com/*",
         "http://www.nytimes.com/*", "https://www.nytimes.com/*",
         "http://www.foxnews.com/*", "https://www.foxnews.com/*",
+        "http://insider.foxnews.com/*", "https://insider.foxnews.com/*",
         "http://www.nbcnews.com/*", "https://www.nbcnews.com/*",
         "http://www.dailymail.co.uk/*", "https://www.dailymail.co.uk/*",
         "http://www.washingtonpost.com/*", "https://www.washingtonpost.com/*",
         "http://www.theguardian.com/*", "https://www.theguardian.com/*",
         "http://www.wsj.com/*", "https://www.wsj.com/*",
         "http://abcnews.go.com/*", "https://abcnews.go.com/*",
-        "http://news.bbc.co.uk/*", "https://news.bbc.co.uk/*",
         "http://www.usatoday.com/*", "https://www.usatoday.com/*",
-        "http://www.latimes.com/*", "https://www.latimes.com/*"
+        "http://www.wired.com/*", "https://www.wired.com/*",
+        "http://news.nationalgeographic.com/*", "https://news.nationalgeographic.com/*",
+        "http://www.nationalgeographic.com/*", "https://www.nationalgeographic.com/*",
+        "http://www.sciencenews.org/*", "https://www.sciencenews.org/*",
+        "http://www.msn.com/*", "https://www.msn.com/*"
       ],
       "js": [
         "content/news-parser/news.js",
@@ -58,7 +62,12 @@
         "content/news-parser/sites/dailymail-parser.js",
         "content/news-parser/sites/guardian-parser.js",
         "content/news-parser/sites/wsj-parser.js",
-        "content/news-parser/sites/abc-parser.js"
+        "content/news-parser/sites/abc-parser.js",
+        "content/news-parser/sites/usatoday-parser.js",
+        "content/news-parser/sites/wired-parser.js",
+        "content/news-parser/sites/natgeo-parser.js",
+        "content/news-parser/sites/sciencenews-parser.js",
+        "content/news-parser/sites/msn-parser.js"
       ]
     }
   ],

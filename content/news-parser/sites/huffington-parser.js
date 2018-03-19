@@ -8,11 +8,14 @@ var huffingtonParser = (function() {
     var newsTitle = $('div.headline h1').text();
     var $article = $('div.entry__body');
     var newsContent = '';
-    /*$article.find('entry__text p').each(function() {
-      newsContent += "<p>" + $(this).text() + "</p>";
-    });*/
-    newsContent += "<p>" + $article.find('.entry__text p').first().text() + "</p>";
-    var newsLink = "<a href=\"" + urlInfo.url + "\">here</a>";
+    var paragraphLimit = 5;
+    $article.find('.entry__text p').each(function() {
+      if (paragraphLimit > 0) {
+        newsContent += "<p>" + $(this).text() + "</p>";
+        paragraphLimit--;
+      }
+    });
+    var newsLink = "<a class='news-link' href=\"" + urlInfo.url + "\">here</a>";
     newsContent += "<br/><p>... To Read more, please click " + newsLink + "</p>";
     var newsImageUrl = '';
     var $articleImage = $article.find('img.image__src');

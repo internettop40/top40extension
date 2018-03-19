@@ -1,15 +1,15 @@
-var nbcParser = (function() {
+var usatodayParser = (function() {
   var module = {};
 
   module.parseData = function (urlInfo) {
     // parse the data we need from yahoo news
-    var regex_res = urlInfo.url.match('https://www.nbcnews.com/.*/(.*)$');
-    var newsId = regex_res && regex_res.length == 2 ? regex_res[1] : '';
-    var newsTitle = $('h1').text();
+    var regex_res = urlInfo.url.match('https://www.usatoday.com/.*/([0-9]+)/$');
+    var newsId = regex_res && regex_res.length == 2 ? 'usatoday-' + regex_res[1] : '';
     var $article = $('article');
+    var newsTitle = $article.find('h1[itemprop="headline"]').text();
     var newsContent = '';
     var paragraphLimit = 5;
-    $article.find('div.article-body p').each(function() {
+    $article.find('p.p-text').each(function() {
       if (paragraphLimit > 0) {
         newsContent += "<p>" + $(this).text() + "</p>";
         paragraphLimit--;
@@ -18,7 +18,7 @@ var nbcParser = (function() {
     var newsLink = "<a class='news-link' href=\"" + urlInfo.url + "\">here</a>";
     newsContent += "<br/><p>... To Read more, please click " + newsLink + "</p>";
     var newsImageUrl = '';
-    var $articleImage = $article.find('figure img').first();
+    var $articleImage = $article.find('div.image-wrap img').first();
     if ($articleImage.length > 0) {
       newsImageUrl = $articleImage.attr('src');
     }
