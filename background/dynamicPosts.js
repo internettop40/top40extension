@@ -404,8 +404,8 @@ function displayPostInfo(data, parent_data, post_view_counts) {
     $('.collapse.embeds').on('show.bs.collapse', function () {
       var $cardBody = $(this).find('.card-body');
       // do youtube stuff
+      var rank = $(this).attr('rank');
       if ((!$cardBody.html() || !$cardBody.html().length) && ("embed" in rankToDisplayInfo[rank])) {
-        var rank = $(this).attr('rank');
         $cardBody.append(rankToDisplayInfo[rank]["embed"]);
         new YT.Player(rankToDisplayInfo[rank]["playerId"], {
           videoId: rankToDisplayInfo[rank]["videoId"],
@@ -544,7 +544,7 @@ function buildYoutubeDisplay(postInfo, parentInfoList, rank) {
                   "</tr></tbody></table>" +
                 "</div>" +
                 "<div id='collapse_" + rank + "' rank='" + rank + "' class='collapse embeds' aria-labelledby='heading_" + rank + "' data-parent='#results' style='padding: 10px;'>" +
-                  "<div class='card-body embed-collapse embed-collpase-iframe'>" +
+                  "<div class='card-body embed-iframe embed-collapse'>" +
                     // this is where embed goes!
                   "</div>" +
                 "</div>" +

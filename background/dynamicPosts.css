@@ -1,13 +1,13 @@
+.embed-iframe {
+  height: -moz-available;
+  height: -webkit-fill-available;
+  height: fill-available;
+}
+
 .embed-collapse {
   padding: 5px 5px !important;
   position: relative;
   width: 100%;
-}
-
-.embed-collapse-iframe {
-  height: -moz-available;
-  height: -webkit-fill-available;
-  height: fill-available;
 }
 
 .embed-collapse iframe {
