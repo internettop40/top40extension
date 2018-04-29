@@ -80,17 +80,33 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
   ) {
     localStorage.setItem(message.key, JSON.stringify(message.data));
   } else if (message.type === 'openDynamicPosts') {
-    openDynamicPosts();
+    openDynamicPosts(message);
   }
 });
 
-function openDynamicPosts () {
+function openDynamicPosts (message) {
+  var currentTab;
+  var query = { active: true, currentWindow: true };
+  chrome.tabs.query(query, function(t) {
+    currentTab = t[0];
+  });
+
+
   chrome.windows.getCurrent(function(w) {
+    var dynamicPostsUrl = 'background/dynamicPosts.html';
+    if ('params' in message) {
+      dynamicPostsUrl += message['params'];
+    }
+
     // create the tab,
     chrome.tabs.create({
-        url: chrome.extension.getURL('background/dynamicPosts.html'),
+        url: chrome.extension.getURL(dynamicPostsUrl),
         active: true
     });
+
+    if ('replaceTab' in message) {
+      chrome.tabs.remove(currentTab.id);
+    }
   });
 }
 

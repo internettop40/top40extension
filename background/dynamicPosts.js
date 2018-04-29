@@ -27,9 +27,12 @@ function addSpinner() {
 $(document).ready(function() {
   load_youtube_iframe_api();
 
+  // check if search query is present.
+  var validQueryPresent = loadFromSearchQuery();
+
   // set search form as collapsible
   $('#searchForm').collapse({
-    toggle: true
+    toggle: !validQueryPresent // show if and only if no search query parameters
   });
 
   getFriendsInfo();
@@ -70,10 +73,7 @@ $(document).ready(function() {
   });
 
   $('#searchForm').submit(function(e){
-    $('#results').html('');
-    $('#results').hide();
-    $('#loading').show();
-    addSpinner();
+    showLoading();
     e.preventDefault();
     var filterData = {};
 
@@ -105,9 +105,18 @@ $(document).ready(function() {
       filterData['location'] = locationData;
     }
 
+    // start the search!
     getPostIds(filterData);
   });
 });
+
+function showLoading() {
+  $('#results').html('');
+  $('#results').hide();
+  $('#share-buttons').hide();
+  $('#loading').show();
+  addSpinner();
+}
 
 function toggleSearchFilters(toggleOption) {
   if (toggleOption === 'getListBtn' || toggleOption === 'hideFilterBtn') {
@@ -131,6 +140,61 @@ function toggleSearchFilters(toggleOption) {
   }
 }
 
+function loadFromSearchQuery() {
+  var query = window.location.search;
+  if (query != "" && query.length > 0 && query.indexOf("?") != -1) {
+    var filterData = {};
+    query = query.substring(1);
+    queryArr = query.split("&");
+    for (var idx in queryArr) {
+      var filterArr = queryArr[idx].split("=");
+      var filterName = filterArr[0];
+      var filterValue = decodeURIComponent(filterArr[1]);
+      filterData[filterName] = JSON.parse(filterValue);
+    }
+
+    if (Object.keys(filterData).length > 0) {
+        showLoading();
+        getPostIds(filterData);
+        return true;
+    }
+  }
+
+  return false;
+}
+
+function updateUrlWithFilter(filterData) {
+  var query = "?";
+  for (var filterName in filterData) {
+    var filter = filterData[filterName];
+    if (query == "?") {
+        query += filterName + "=" + JSON.stringify(filter);
+    } else {
+        query += "&" + filterName + "=" + JSON.stringify(filter);
+    }
+  }
+
+  // update url without refreshing
+  if (history.pushState) {
+      var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + query;
+      window.history.pushState({path:newurl},'',newurl);
+  }
+  var shareUrl = 'https://www.internettop40.com/mytop40' + query;
+  updateShareButtons(shareUrl);
+}
+
+function updateShareButtons(url) {
+  var facebookShare = 'https://facebook.com/sharer/sharer.php?u=' + url;
+  var twitterShare = 'https://twitter.com/intent/tweet/?text=My%20Top40%20List&amp;url=' + url;
+  var googleShare = 'https://plus.google.com/share?url=' + url;
+  var pinterestShare = 'https://pinterest.com/pin/create/button/?url=' + url + '&amp;media=' + url + '&amp;description=My%20Top40%20List';
+
+  $('#facebookSharebutton').attr('href', facebookShare);
+  $('#twitterShareButton').attr('href', twitterShare);
+  $('#googleShareButton').attr('href', googleShare);
+  $('#pinterestShareButton').attr('href', pinterestShare);
+}
+
 function getPostIds(filterData) {
   $.ajax({
     type: 'POST',
@@ -149,6 +213,7 @@ function getPostIds(filterData) {
       }
       */
       if (data != null) {
+        updateUrlWithFilter(filterData);
         fetchPostInfo(Object.keys(data), data);
       } else {
         console.log('data is null!');
@@ -453,8 +518,7 @@ function displayPostInfo(data, parent_data, post_view_counts) {
     });
   }
   $('#results').show();
-
-
+  $('#share-buttons').show();
 }
 
 function buildPagination(numPages) {
