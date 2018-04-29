@@ -180,7 +180,7 @@ function updateUrlWithFilter(filterData) {
       window.history.pushState({path:newurl},'',newurl);
   }
   var shareUrl = 'https://www.internettop40.com/mytop40' + query;
-  updateShareButtons(shareUrl);
+  updateShareButtons(encodeURIComponent(shareUrl));
 }
 
 function updateShareButtons(url) {
