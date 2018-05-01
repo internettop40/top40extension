@@ -1,4 +1,4 @@
-var youtube = (function () {
+var youtube = (function (run_mode = true) {
   var module = {
     watchVideoInterval: 5000,
     apiData: {}
@@ -170,9 +170,13 @@ var youtube = (function () {
     return videosWatched;
   };
 
-  main.runOnUrlChange(module.run);
+  if (run_mode == true) {
+    main.runOnUrlChange(module.run);
+  }
 
   return module;
 });
 
-$(document).ready(youtube);
+if (window.location.hostname == "www.youtube.com") {
+    $(document).ready(youtube);
+}

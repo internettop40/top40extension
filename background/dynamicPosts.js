@@ -6,7 +6,7 @@ var payload = {
 };
 */
 
-var youtube_module = youtube();
+var youtube_module = youtube(false);
 
 function addSpinner() {
   $("#loadingSpinner").spin("large", "black");
@@ -148,13 +148,14 @@ function loadFromSearchQuery() {
     queryArr = query.split("&");
     for (var idx in queryArr) {
       var filterArr = queryArr[idx].split("=");
-      var filterName = filterArr[0];
+      var filterName = filterArr[0].replace('amp;', '');
       var filterValue = decodeURIComponent(filterArr[1]);
       filterData[filterName] = JSON.parse(filterValue);
     }
 
     if (Object.keys(filterData).length > 0) {
         showLoading();
+        console.log(filterData);
         getPostIds(filterData);
         return true;
     }
@@ -217,6 +218,7 @@ function getPostIds(filterData) {
         fetchPostInfo(Object.keys(data), data);
       } else {
         console.log('data is null!');
+        console.log(filterData);
       }
     }
   });
