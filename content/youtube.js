@@ -170,7 +170,8 @@ var youtube = (function (run_mode = true) {
     return videosWatched;
   };
 
-  if (run_mode == true) {
+  if (run_mode != false) {
+    console.log('lets run');
     main.runOnUrlChange(module.run);
   }
 
