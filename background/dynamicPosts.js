@@ -141,7 +141,8 @@ function toggleSearchFilters(toggleOption) {
 }
 
 function loadFromSearchQuery() {
-  var query = window.location.search;
+  var regex = new RegExp('&quot;', 'g');
+  var query = window.location.search.replace(regex, '"');
   if (query != "" && query.length > 0 && query.indexOf("?") != -1) {
     var filterData = {};
     query = query.substring(1);
@@ -186,14 +187,40 @@ function updateUrlWithFilter(filterData) {
 
 function updateShareButtons(url) {
   var facebookShare = 'https://facebook.com/sharer/sharer.php?u=' + url;
-  var twitterShare = 'https://twitter.com/intent/tweet/?text=My%20Top40%20List&amp;url=' + url;
+  var regex = new RegExp('"', 'g');
+  var twitterShare = 'https://twitter.com/share?text=My%20Top40%20List&url=' + encodeURIComponent(decodeURIComponent(url).replace(regex, '&quot;'));
   var googleShare = 'https://plus.google.com/share?url=' + url;
-  var pinterestShare = 'https://pinterest.com/pin/create/button/?url=' + url + '&amp;media=' + url + '&amp;description=My%20Top40%20List';
+  var pinterestShare = 'https://pinterest.com/pin/create/button/?url=' + url + '&description=My%20Top40%20List%20' + encodeURIComponent(decodeURIComponent(url).replace(regex, '&quot;'));
 
   $('#facebookSharebutton').attr('href', facebookShare);
   $('#twitterShareButton').attr('href', twitterShare);
   $('#googleShareButton').attr('href', googleShare);
   $('#pinterestShareButton').attr('href', pinterestShare);
+}
+
+function appendSnaxIdToShareLink(snax_id, postInfo) {
+  var fbLink = $('#facebookSharebutton').attr('href');
+  var twitterLink = $('#twitterShareButton').attr('href');
+  var googleLink = $('#googleShareButton').attr('href');
+  var pinterestLink = $('#pinterestShareButton').attr('href');
+
+  var snax_id_param = encodeURIComponent("&snax_id=" + snax_id);
+  $('#facebookSharebutton').attr('href', fbLink + snax_id_param);
+  $('#twitterShareButton').attr('href', twitterLink + snax_id_param);
+  $('#googleShareButton').attr('href', googleLink + snax_id_param);
+
+  var pinterestMedia = '';
+  var postName = postInfo['post_name'];
+  if (/^youtube-/.test(postName)) {
+    var videoId = postInfo['post_name'].split('youtube-')[1];
+    var imageUrl = "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg";
+    pinterestMedia = "&media=" + imageUrl;
+  } else if(/^top40-news-/.test(postName)) {
+    var $postContent = $(postInfo['post_content']);
+    var thumbnailSrc = $postContent.find('img').attr('src');
+    pinterestMedia = "&media=" + thumbnailSrc;
+  }
+  $('#pinterestShareButton').attr('href', pinterestLink + snax_id_param + pinterestMedia);
 }
 
 function getPostIds(filterData) {
@@ -447,6 +474,11 @@ function displayPostInfo(data, parent_data, post_view_counts) {
       listsByPage[curPage] += displayInfo["item"];
       rankToDisplayInfo[i+1] = displayInfo;
       displayCount++;
+
+      // update share link here!
+      if (i == 0) {
+        appendSnaxIdToShareLink(postInfo['ID'], postInfo);
+      }
     }
   }
 

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "IT40.com Extension",
   "description": "Browser extension for IT40.com",
-  "version": "1.0.32",
+  "version": "1.0.33",
   "background": {
     "scripts": [
       "background/background.js"
