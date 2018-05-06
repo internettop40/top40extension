@@ -188,9 +188,9 @@ function updateUrlWithFilter(filterData) {
 function updateShareButtons(url) {
   var facebookShare = 'https://facebook.com/sharer/sharer.php?u=' + url;
   var regex = new RegExp('"', 'g');
-  var twitterShare = 'https://twitter.com/share?text=My%20Top40%20List&url=' + encodeURIComponent(decodeURIComponent(url).replace(regex, '&quot;'));
-  var googleShare = 'https://plus.google.com/share?url=' + url;
-  var pinterestShare = 'https://pinterest.com/pin/create/button/?url=' + url + '&description=My%20Top40%20List%20' + encodeURIComponent(decodeURIComponent(url).replace(regex, '&quot;'));
+  var twitterShare = 'https://twitter.com/share?text=My%20IT40%20Chart&url=' + encodeURIComponent(decodeURIComponent(url).replace(regex, '&quot;'));
+  var googleShare = 'https://plus.google.com/share?text=My%20IT40%20Chart&url=' + url;
+  var pinterestShare = 'https://pinterest.com/pin/create/button/?url=' + url + '&description=My%20IT40%20Chart%20' + encodeURIComponent(decodeURIComponent(url).replace(regex, '&quot;'));
 
   $('#facebookSharebutton').attr('href', facebookShare);
   $('#twitterShareButton').attr('href', twitterShare);
