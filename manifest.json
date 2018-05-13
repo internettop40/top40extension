@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "IT40.com Extension",
   "description": "Browser extension for IT40.com",
-  "version": "1.0.35",
+  "version": "1.0.36",
   "background": {
     "scripts": [
       "background/background.js"
@@ -22,6 +22,12 @@
       "matches": ["http://www.youtube.com/*", "https://www.youtube.com/*"],
       "js": [
         "content/youtube.js"
+      ]
+    },
+    {
+      "matches": ["https://www.facebook.com/*", "http://www.facebook.com/*"],
+      "js": [
+        "content/facebook.js"
       ]
     },
     {
