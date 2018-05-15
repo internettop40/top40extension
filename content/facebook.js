@@ -36,7 +36,7 @@ var facebook = (function (run_mode = true) {
       var facebookData = {
         videoId: urlInfo.url.match(/\/videos\/(\d+)\/$/)[1],
         videoUrl: urlInfo.url,
-        videoTitle: $('title').text().replace(/ - Facebook Search$/, "")
+        videoTitle: $('div[title]').first().attr('title') || $('title').text().replace(/ - Facebook Search$/, "")
       }; // api data to send to the server
 
       resolve(facebookData);
