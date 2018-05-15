@@ -36,7 +36,7 @@ var facebook = (function (run_mode = true) {
       var facebookData = {
         videoId: urlInfo.url.match(/\/videos\/(\d+)\/$/)[1],
         videoUrl: urlInfo.url,
-        videoTitle: $('title').text()
+        videoTitle: $('title').text().replace(/ - Facebook Search$/, "")
       }; // api data to send to the server
 
       resolve(facebookData);
@@ -152,7 +152,7 @@ var facebook = (function (run_mode = true) {
   };
 
   module.isVideoPage = function () {
-    return /\/videos\//.test(window.location.href);
+    return /\/videos\/(\d+)/.test(window.location.href);
   };
 
   if (run_mode != false) {
