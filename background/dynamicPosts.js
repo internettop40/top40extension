@@ -38,15 +38,15 @@ $(document).ready(function() {
   getFriendsInfo();
 
   $('#datepicker').datepicker({
+    autoclose: true,
+    forceParse: false,
     format: 'm/d/yyyy',
     startDate: '-365d',
     endDate: '0d',
   });
 
-  var defaultStart = moment().subtract(7, 'days').format('l');
-  var defaultEnd = moment().format('l');
+  var defaultStart = moment().format('l');
   $('#startDate').val(defaultStart);
-  $('#endDate').val(defaultEnd);
 
   getLocationInfo().then(function(location_data) {
     setLocationInfo(location_data);
@@ -72,6 +72,18 @@ $(document).ready(function() {
     }
   });
 
+  // handle date type radio toggle
+  $('input[name="date_type"]').change(function() {
+    var dateType = $(this).val();
+    if (dateType == 'weekly') {
+      $('#weekpicker').show();
+      $('#datepicker').hide();
+    } else {
+      $('#datepicker').show();
+      $('#weekpicker').hide();
+    }
+  })
+
   $('#searchForm').submit(function(e){
     showLoading();
     e.preventDefault();
@@ -81,14 +93,25 @@ $(document).ready(function() {
     var postType = $('#postTypeFilter').val();
     filterData['post_type'] = postType;
 
-    var defaultStart = moment().subtract(7, 'days').format('l');
-    var defaultEnd = moment().format('l');
-    var postStartDate = $('#startDate').val();
-    var postEndDate = $('#endDate').val();
-    if (postStartDate == null || postStartDate.length == 0) { postStartDate = defaultStart; }
-    if (postEndDate == null || postEndDate.length == 0) { postEndDate = defaultEnd; }
-    filterData['start_date'] = moment(postStartDate).format("YYYY-MM-DD");
-    filterData['end_date'] = moment(postEndDate).format("YYYY-MM-DD");
+    var dateType = $('input[name="date_type"]:checked').val();
+    filterData['date_type'] = dateType;
+
+    if (dateType == 'daily') {
+      var defaultStart = moment().format('l');
+      var defaultEnd = defaultStart;
+      var postStartDate = $('#startDate').val();
+      var postEndDate = postStartDate;
+      if (postStartDate == null || postStartDate.length == 0) { postStartDate = defaultStart; }
+      if (postEndDate == null || postEndDate.length == 0) { postEndDate = defaultEnd; }
+      filterData['start_date'] = moment(postStartDate).format("YYYY-MM-DD");
+      filterData['end_date'] = moment(postEndDate).format("YYYY-MM-DD");
+    } else {
+      var startWeekVal = $('#startWeek').val().split(" - ");
+      var postStartDate = startWeekVal[0];
+      var postEndDate = startWeekVal[1];
+      filterData['start_date'] = moment(postStartDate).format("YYYY-MM-DD");
+      filterData['end_date'] = moment(postEndDate).format("YYYY-MM-DD");
+    }
 
     var filterByFriends = $('#filterFriendsCheckbox').prop('checked');
     var filterByLocation = $('#filterLocationCheckbox').prop('checked');
@@ -422,10 +445,14 @@ function fetchPostInfoHelper(post_info_list, post_view_counts) {
 }
 
 function sort_by_rank(a,b) {
-  // return sort by rank desc;
+  // return sort by rank desc, ID ASC;
   if (a.view_count < b.view_count) {
     return 1;
   } else if (a.view_count > b.view_count) {
+    return -1;
+  } else if (a.ID > b.ID) {
+    return 1;
+  } else if (a.ID < b.ID) {
     return -1;
   }
   return 0;
@@ -462,19 +489,22 @@ function displayPostInfo(data, parent_data, post_view_counts) {
   var curPage = 0;
   var itemsPerPage = 40; // 40 items at a time!
   var displayCount = 0;
+
   for (var i = 0; i < merged_data.length; i++) {
     var postInfo = merged_data[i];
     var postName = postInfo['post_name'];
 
+    var displayInfo;
     if (/^youtube-/.test(postName)) {
-      var displayInfo = buildYoutubeDisplay(postInfo, parent_data, i+1);
+      displayInfo = buildYoutubeDisplay(postInfo, parent_data, i+1);
     } else if (/^top40-news-/.test(postName)) {
-      var displayInfo = buildNewsDisplay(postInfo, parent_data, i+1);
+      displayInfo = buildNewsDisplay(postInfo, parent_data, i+1);
     } else if (/facebook-/.test(postName)) {
-      var displayInfo = buildFacebookDisplay(postInfo, parent_data, i+1);
+      displayInfo = buildFacebookDisplay(postInfo, parent_data, i+1);
     } else if (/instagram-/.test(postName)) {
-      var displayInfo = buildInstagramDisplay(postInfo, parent_data, i+1);
+      displayInfo = buildInstagramDisplay(postInfo, parent_data, i+1);
     }
+
     if (/^youtube-/.test(postName) ||
         /^top40-news-/.test(postName) ||
         /facebook-/.test(postName) ||
@@ -513,6 +543,23 @@ function displayPostInfo(data, parent_data, post_view_counts) {
     $('.page-results').hide();
     $('#page-0').show();
     buildPagination(Object.keys(listsByPage).length);
+
+    // do instagram stuff
+    $('img.insta_thumbnail').each(function () {
+      var $img = $(this)
+      var videoId = $img.attr('videoId');
+      $.ajax({
+        type: 'GET',
+        url: "https://api.instagram.com/oembed/?url=http://instagr.am/p/" + videoId + "/",
+        error: function(err) {
+          console.log(err);
+        },
+        dataType: 'json',
+        success: function(data) {
+          $img.attr('src', data.thumbnail_url);
+        }
+      });
+    });
 
     $('.collapse.embeds').on('show.bs.collapse', function () {
       var $cardBody = $(this).find('.card-body');
@@ -760,9 +807,74 @@ function buildFacebookDisplay(postInfo, parentInfoList, rank) {
    };
 }
 
+function buildInstagramDisplay(postInfo, parentInfoList, rank) {
+    var parentInfo = {};
+    for (var idx in parentInfoList) {
+      if (postInfo['post_parent'] === parentInfoList[idx]['ID']) {
+        parentInfo = parentInfoList[idx];
+      }
+    }
+    var videoId = postInfo['post_name'].split('instagram-')[1];
+    var embed = '<iframe src="http://instagram.com/p/' + videoId + '/embed" frameborder="0" style="width: 80%;"></iframe>';
+    var embedSmall = "<img videoId='" + videoId + "' width=150 height=100 class='insta_thumbnail' />";
+    var viewButton = "<button class='btn btn-secondary btn-sm' data-toggle='collapse' style='float: right; position: absolute; top: 20px; right: 8px;'" +
+                        " data-target='#collapse_" +
+                        rank + "' aria-expanded='true' aria-controls='collapse_" + rank + "'>" +
+                        "view" +
+                  "</button>";
+    var viewCount = "<small><b>" + postInfo['view_count'] + "</b> views</small>";
+    var card = "<div class='card' style='margin: 0px 5px;'>" +
+                  "<div class='card-header' style='padding: 0.1rem 0.5rem;' id='heading_" + rank + "'>" +
+                    "<table style='width: inherit;'><tbody><tr>" +
+                      "<td style='min-width: 50px;'><h5 style='margin-bottom: 0px; text-align: center;'>" +  "#" + rank + "</h5><div>" + viewCount + "</div></td>" +
+                      "<td padding-left: 5px;>" +  embedSmall + "</td>" +
+                      "<td style='padding: 0px 10px; vertical-align: middle;'>" +
+                        "<div style='overflow: hidden;'><b>"
+                        +  postInfo['post_title'] + "</b></div>" +
+                      "</td>" +
+                      "<td style='min-width: 55px; vertical-align: middle;'>" +  viewButton + "</td>" +
+                    "</tr></tbody></table>" +
+                  "</div>" +
+                  "<div id='collapse_" + rank + "' rank='" + rank + "' class='collapse embeds' aria-labelledby='heading_" + rank + "' data-parent='#results' style='padding: 10px;'>" +
+                    "<div class='card-body facebook-responsive'>" +
+                      embed +
+                    "</div>" +
+                  "</div>" +
+               "</div>";
+     return {
+         "item": card,
+         "videoId": videoId
+     };
+}
+
 function load_youtube_iframe_api() {
   var tag = document.createElement('script');
   tag.src = "iframe_api.js";
   var firstScriptTag = document.getElementsByTagName('script')[0];
   firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 }
+
+// https://jsfiddle.net/prtk/znbx32j1/1/
+function set_week_picker(date, weekpicker) {
+    start_date = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + 1);
+    end_date = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + 7);
+    weekpicker.datepicker('update', start_date);
+    weekpicker.val((start_date.getMonth() + 1) + '/'
+     + start_date.getDate() + '/' + start_date.getFullYear() + ' - '
+     + (end_date.getMonth() + 1) + '/' + end_date.getDate() + '/' + end_date.getFullYear());
+}
+
+$(document).ready(function() {
+    var weekpicker = $('#startWeek');
+    weekpicker.datepicker({
+        autoclose: true,
+        forceParse: false,
+        container: '#weekpicker',
+        weekStart: 1,
+        startDate: '-365d',
+        endDate: '0d'
+    }).on("changeDate", function(e) {
+        set_week_picker(e.date, weekpicker);
+    });
+    set_week_picker(new Date, weekpicker);
+});

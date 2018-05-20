@@ -37,3 +37,22 @@
     width:100%;
     position:absolute;
 }
+
+#weekpicker .datepicker table tr td span.active{
+    background: #04c!important;
+    border-color: #04c!important;
+}
+#weekpicker .datepicker .datepicker-days tr td.active {
+    background: #04c!important;
+}
+#weekpicker .datepicker .datepicker-days tr td.active~td, #weekpicker .datepicker .datepicker-days tr td.active {
+    color: #fff;
+    background-color: #04c;
+    border-radius: 0;
+}
+
+#weekpicker .datepicker .datepicker-days tr:hover td, #weekpicker .datepicker table tr td.day:hover, #weekpicker .datepicker table tr td.focused {
+    color: #000!important;
+    background: #e5e2e3!important;
+    border-radius: 0!important;
+}

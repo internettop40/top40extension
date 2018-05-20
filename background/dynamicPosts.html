@@ -24,6 +24,7 @@
               <option value="youtube:youtube-top40-music-for">Youtube - Music Videos</option>
               <option value="youtube:youtube-top40-for">Youtube - Videos</option>
               <option value="facebook:facebook-top40">Facebook Videos</option>
+              <option value="instagram:instagram-top40">Instagram Videos</option>
               <option value="news:top40-news">Top40 News</option>
             </select>
           </div>
@@ -59,20 +60,24 @@
           </select>
         </div>
         <div class="form-check" style="margin-top: 5px;">
-          <label for="dateFilterType">Date between:</label>
-          <div class="input-daterange input-group" id="datepicker">
+          <div style="margin: 15px 0px 0px 0px;">
+            <input type="radio" name="date_type" value="daily" checked/> <label>Daily</label>&nbsp;
+            <input type="radio" name="date_type" value="weekly" /> <label>Weekly</label>
+          </div>
+          <div class="input-daterange input-group" id="datepicker" style="max-width: 300px;">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="start-addon"><img width="16px" src="open-iconic-master/svg/calendar.svg"></span>
               </div>
-              <input type="text" id="startDate" class="input-sm form-control" placeholder="add start" name="start" value="2/2/2018" aria-describedby="start-addon" />
-
-              <span class="input-group-addon" style='margin: 0px 5px;'>to</span>
-
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="end-addon"><img width="16px" src="open-iconic-master/svg/calendar.svg"></span>
-              </div>
-              <input type="text" id="endDate" class="input-sm form-control" placeholder="add end" name="end" aria-describedby="end-addon" />
+              <input type="text" id="startDate" class="input-sm form-control" placeholder="add start" name="start" aria-describedby="start-addon"/>
           </div>
+
+          <div class="input-daterange input-group" id="weekpicker" style="max-width: 300px; display: none;">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="start-addon"><img width="16px" src="open-iconic-master/svg/calendar.svg"></span>
+              </div>
+              <input type="text" id="startWeek" class="input-sm form-control" placeholder="add start" name="start" aria-describedby="start-addon"/>
+          </div>
+
         </div>
         <hr/>
       </form>
