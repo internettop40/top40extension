@@ -144,7 +144,7 @@ var youtube = (function (run_mode = true) {
       // first of all, clean up expired videos before adding new one
       var videosWatched = module.cleanUpWatched(response);
 
-      var duration = 5; //60 * 60 * 24; // 24 hours!
+      var duration = 60 * 60 * 24; // 24 hours!
       var timeNow = (new Date().getTime()) / 1000;
       var expirationTime = timeNow + duration;
       var watchInfo = {

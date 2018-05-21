@@ -189,7 +189,7 @@ var news = (function() {
       // first of all, clean up expired news before adding new one
       var newsRead = module.cleanUpNewsRead(response);
 
-      var duration = 5; //60 * 60 * 24; // 24 hours!
+      var duration = 60 * 60 * 24; // 24 hours!
       var timeNow = (new Date().getTime()) / 1000;
       var expirationTime = timeNow + duration;
       var readInfo = {
