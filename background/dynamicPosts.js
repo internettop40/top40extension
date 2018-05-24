@@ -462,6 +462,8 @@ function displayPostInfo(data, parent_data, post_view_counts) {
   // empty the results first!
   $('#loading').hide();
 
+  var isFacebook = false;
+
   // merge duplicated items using post_name
   var post_names_combined_view_counts = {};
   var merged_data = []; // list that merges daily and weekly data into 1
@@ -473,6 +475,10 @@ function displayPostInfo(data, parent_data, post_view_counts) {
     } else {
       post_names_combined_view_counts[postInfo['post_name']] = parseInt(post_view_counts[postInfo['ID']]);
       merged_data.push(data[i]);
+    }
+
+    if (/facebook-/.test(postInfo['post_name'])) {
+      isFacebook = true;
     }
   }
 
@@ -487,7 +493,7 @@ function displayPostInfo(data, parent_data, post_view_counts) {
   var listsByPage = {}; // items to put in the results section as we paginate.
   var rankToDisplayInfo = {}; // key = rank, value = embed
   var curPage = 0;
-  var itemsPerPage = 40; // 40 items at a time!
+  var itemsPerPage = isFacebook ? 10 : 40; // 40 items at a time!
   var displayCount = 0;
 
   for (var i = 0; i < merged_data.length; i++) {
@@ -546,7 +552,7 @@ function displayPostInfo(data, parent_data, post_view_counts) {
 
     // do instagram stuff
     $('img.insta_thumbnail').each(function () {
-      var $img = $(this)
+      var $img = $(this);
       var videoId = $img.attr('videoId');
       $.ajax({
         type: 'GET',
@@ -571,39 +577,41 @@ function displayPostInfo(data, parent_data, post_view_counts) {
       var rank = $(this).attr('rank');
       if ((!$cardBody.html() || !$cardBody.html().length) && ("embed" in rankToDisplayInfo[rank])) {
         $cardBody.append(rankToDisplayInfo[rank]["embed"]);
-        new YT.Player(rankToDisplayInfo[rank]["playerId"], {
-          videoId: rankToDisplayInfo[rank]["videoId"],
-          events: {
-            'onStateChange': function (event) {
-              if (event.data == YT.PlayerState.PLAYING || event.data == YT.PlayerState.BUFFERING) {
-                rankToDisplayInfo[rank]["isPlaying"] = true;
+        if ("playerId" in rankToDisplayInfo[rank]) {
+          new YT.Player(rankToDisplayInfo[rank]["playerId"], {
+            videoId: rankToDisplayInfo[rank]["videoId"],
+            events: {
+              'onStateChange': function (event) {
+                if (event.data == YT.PlayerState.PLAYING || event.data == YT.PlayerState.BUFFERING) {
+                  rankToDisplayInfo[rank]["isPlaying"] = true;
 
-                setTimeout(function() {
-                  if (rankToDisplayInfo[rank]["isPlaying"] == true && !("dataSent" in rankToDisplayInfo[rank])) {
-                    rankToDisplayInfo[rank]["dataSent"] = true;
-                    var vUrl = event.target.getVideoUrl();
-                    var vData = event.target.getVideoData();
-                    var youtubeData = {
-                      data: {
-                        videoId: vData.video_id,
-                        videoTitle: vData.title,
-                        videoUrl: vUrl,
-                        isMusicVideo: rankToDisplayInfo[rank]["isMusicVideo"]
-                      }
-                    };
-                    // add geolocation as well
-                    geolocation.getLocationInfo(function (userLocation) {
-                      youtubeData.geolocation = userLocation;
-                      youtube_module.prepareData(youtubeData);
-                    });
-                  }
-                }, 15000);
-              } else {
-                rankToDisplayInfo[rank]["isPlaying"] = false;
+                  setTimeout(function() {
+                    if (rankToDisplayInfo[rank]["isPlaying"] == true && !("dataSent" in rankToDisplayInfo[rank])) {
+                      rankToDisplayInfo[rank]["dataSent"] = true;
+                      var vUrl = event.target.getVideoUrl();
+                      var vData = event.target.getVideoData();
+                      var youtubeData = {
+                        data: {
+                          videoId: vData.video_id,
+                          videoTitle: vData.title,
+                          videoUrl: vUrl,
+                          isMusicVideo: rankToDisplayInfo[rank]["isMusicVideo"]
+                        }
+                      };
+                      // add geolocation as well
+                      geolocation.getLocationInfo(function (userLocation) {
+                        youtubeData.geolocation = userLocation;
+                        youtube_module.prepareData(youtubeData);
+                      });
+                    }
+                  }, 15000);
+                } else {
+                  rankToDisplayInfo[rank]["isPlaying"] = false;
+                }
               }
             }
-          }
-        });
+          });
+        }
       }
     });
 
@@ -618,6 +626,9 @@ function displayPostInfo(data, parent_data, post_view_counts) {
   }
   $('#results').show();
   $('#share-buttons').show();
+
+  // load on scroll/visible
+  loadOnScroll();
 }
 
 function buildPagination(numPages) {
@@ -772,7 +783,7 @@ function buildFacebookDisplay(postInfo, parentInfoList, rank) {
     }
   }
   var videoId = postInfo['post_name'].split('facebook-')[1];
-  var videoUrl = 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(postInfo['post_content']);
+  var videoUrl = 'https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(postInfo['post_content']);
   var embed = '<iframe src="' + videoUrl + '&show_text=true&appId' +
               '" style="border:none;overflow:hidden;" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true" allow="encrypted-media"></iframe>';
   var embedSmall = '<iframe src="' + videoUrl + '&show_text=true&appId&width=150&height=100' +
@@ -787,7 +798,7 @@ function buildFacebookDisplay(postInfo, parentInfoList, rank) {
                 "<div class='card-header' style='padding: 0.1rem 0.5rem;' id='heading_" + rank + "'>" +
                   "<table style='width: inherit;'><tbody><tr>" +
                     "<td style='min-width: 50px;'><h5 style='margin-bottom: 0px; text-align: center;'>" +  "#" + rank + "</h5><div>" + viewCount + "</div></td>" +
-                    "<td padding-left: 5px;>" +  embedSmall + "</td>" +
+                    "<td padding-left: 5px; class='loadOnScroll' content='"  + encodeURIComponent(embedSmall) + "'>" + "</td>" + //embed small here
                     "<td style='padding: 0px 10px; vertical-align: middle;'>" +
                       "<div style='overflow: hidden;'><b>"
                       +  postInfo['post_title'] + "</b></div>" +
@@ -797,13 +808,14 @@ function buildFacebookDisplay(postInfo, parentInfoList, rank) {
                 "</div>" +
                 "<div id='collapse_" + rank + "' rank='" + rank + "' class='collapse embeds' aria-labelledby='heading_" + rank + "' data-parent='#results' style='padding: 10px;'>" +
                   "<div class='card-body facebook-responsive' style=''>" +
-                    embed +
+                    // this is where the embed goes!
                   "</div>" +
                 "</div>" +
              "</div>";
    return {
        "item": card,
-       "videoId": videoId
+       "videoId": videoId,
+       "embed": embed
    };
 }
 
@@ -878,3 +890,31 @@ $(document).ready(function() {
     });
     set_week_picker(new Date, weekpicker);
 });
+
+$(document).ready(function() {
+  $(window).scroll(loadOnScroll);
+  $(window).resize(loadOnScroll);
+});
+
+function isScrolledIntoView(el) {
+    var rect = el.getBoundingClientRect();
+    var elemTop = rect.top;
+    var elemBottom = rect.bottom;
+
+    // Only completely visible elements return true:
+    var isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+    // Partially visible elements return true:
+    //isVisible = elemTop < window.innerHeight && elemBottom >= 0;
+    return isVisible;
+}
+
+function loadOnScroll() {
+  $('.loadOnScroll').each(function() {
+    var el = $(this)[0];
+    if (!$(this).hasClass('loaded') && isScrolledIntoView(el)) {
+      $(this).addClass('loaded');
+      var content = decodeURIComponent($(this).attr('content'));
+      $(this).append(content);
+    }
+  });
+}

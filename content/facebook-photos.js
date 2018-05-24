@@ -1,31 +1,31 @@
 var facebook = (function (run_mode = true) {
   var module = {
     apiData: {},
-    watchVideoInterval: 5000
+    watchPhotoInterval: 5000
   };
 
   module.run = function () {
-    if (module.isVideoPage()) {
+    if (module.isPhotoPage()) {
       var urlInfo = main.getUrlInfo();
 
       // fetch user location info, then call parse function
       function getUserLocation (userLocation) {
-        // wait for user to watch video for some time, and then parse the video
+        // wait for user to watch photo for some time, and then parse the photo
         setTimeout(function(){
           module.apiData.geolocation = userLocation;
           module.parseFacebook(urlInfo).then(function(data) {
             module.apiData.data = data;
-            module.alreadyWatched(data.videoId).then(function(watched) {
+            module.alreadyWatched(data.photoId).then(function(watched) {
               if (!watched) {
                 module.prepareData(module.apiData);
               } else {
-                console.log('already watched: ' + data.videoId);
+                console.log('already watched: ' + data.photoId);
               }
             });
           }, function(err) {
             console.log('error');
           });
-        }, module.watchVideoInterval);
+        }, module.watchPhotoInterval);
       }
       geolocation.getLocationInfo(getUserLocation);
     }
@@ -34,9 +34,9 @@ var facebook = (function (run_mode = true) {
   module.parseFacebook = function (urlInfo) {
     var promise = new Promise(function(resolve, reject) {
       var facebookData = {
-        videoId: urlInfo.url.match(/\/videos\/(\d+)\/$/)[1],
-        videoUrl: urlInfo.url,
-        videoTitle: $('title').text().replace(/^\(\d+\) /, "").replace(/ - Facebook Search$/, "")
+        photoId: urlInfo.url.match(/\/photos\/(.*)\/\?/)[1],
+        photoUrl: urlInfo.url,
+        photoTitle: $('title').text().replace(/^\(\d+\) /, "").replace(/ - Facebook Search$/, "")
       }; // api data to send to the server
 
       resolve(facebookData);
@@ -45,11 +45,11 @@ var facebook = (function (run_mode = true) {
   };
 
   module.buildPostContent = function(payloadData) {
-    return payloadData.videoUrl;
+    return payloadData.photoUrl;
   };
 
   module.prepareData = function (payload) {
-    if (!payload.data.videoId) {
+    if (!payload.data.photoId) {
       return;
     }
 
@@ -60,8 +60,8 @@ var facebook = (function (run_mode = true) {
       payload.wp_data = {
         user_email_or_id: email_or_id,
         post_content: module.buildPostContent(payload.data),
-        post_title: payload.data.videoTitle,
-        post_name: "facebook-" + payload.data.videoId,
+        post_title: payload.data.photoTitle,
+        post_name: "facebook-" + payload.data.photoId,
         post_type: 'facebook'
       };
       console.log('sending: ' + JSON.stringify(payload));
@@ -87,17 +87,17 @@ var facebook = (function (run_mode = true) {
         }
       });
     });
-    module.addWatched(payload.data.videoId);
+    module.addWatched(payload.data.photoId);
   };
 
-  // returns true if video already watched, false if not watched
-  module.alreadyWatched = function(videoId) {
+  // returns true if photo already watched, false if not watched
+  module.alreadyWatched = function(photoId) {
     var promise = new Promise(function(resolve, reject) {
-      // getVideosWatched must return { videoId: {videoId: "asdf", expirationTime: 12345} }
-      chrome.runtime.sendMessage({type: "getVideosWatched", key: "fb-videos-watched"}, function(response) {
-        var videosWatched = response;
+      // getPhotosWatched must return { photoId: {photoId: "asdf", expirationTime: 12345} }
+      chrome.runtime.sendMessage({type: "getPhotosWatched", key: "fb-photos-watched"}, function(response) {
+        var photosWatched = response;
 
-        var watchInfo = videosWatched[videoId];
+        var watchInfo = photosWatched[photoId];
         if(!watchInfo) {
           // resolving false since not found in watchInfo
           resolve(false);
@@ -108,8 +108,8 @@ var facebook = (function (run_mode = true) {
         var expirationTime = watchInfo['expirationTime'];
         if (expirationTime && expirationTime < timeNow) {
           // then we need to remove this item
-          delete(videosWatched[videoId]);
-          chrome.runtime.sendMessage({type: "updateVideosWatched", data: videosWatched, key: "fb-videos-watched"});
+          delete(photosWatched[photoId]);
+          chrome.runtime.sendMessage({type: "updatePhotosWatched", data: photosWatched, key: "fb-photos-watched"});
           resolve(false);
         } else {
           resolve(true);
@@ -119,44 +119,44 @@ var facebook = (function (run_mode = true) {
     return promise;
   };
 
-  module.addWatched = function(videoId) {
-    // getVideosWatched must return { videoId: {videoId: "asdf", expirationTime: 12345} }
-    chrome.runtime.sendMessage({type: "getVideosWatched", key: "fb-videos-watched"}, function(response) {
-      // first of all, clean up expired videos before adding new one
-      var videosWatched = module.cleanUpWatched(response);
+  module.addWatched = function(photoId) {
+    // getPhotosWatched must return { photoId: {photoId: "asdf", expirationTime: 12345} }
+    chrome.runtime.sendMessage({type: "getPhotosWatched", key: "fb-photos-watched"}, function(response) {
+      // first of all, clean up expired photos before adding new one
+      var photosWatched = module.cleanUpWatched(response);
 
       var duration = 60 * 60 * 24; // 24 hours!
       var timeNow = (new Date().getTime()) / 1000;
       var expirationTime = timeNow + duration;
       var watchInfo = {
-        "videoId": videoId,
+        "photoId": photoId,
         "expirationTime": expirationTime
       };
-      videosWatched[videoId] = watchInfo;
-      chrome.runtime.sendMessage({type: "updateVideosWatched", data: videosWatched, key: "fb-videos-watched"});
+      photosWatched[photoId] = watchInfo;
+      chrome.runtime.sendMessage({type: "updatePhotosWatched", data: photosWatched, key: "fb-photos-watched"});
     });
   };
 
-  module.cleanUpWatched = function(videosWatched) {
-    for (var videoId in videosWatched) {
-      var watchInfo = videosWatched[videoId];
+  module.cleanUpWatched = function(photosWatched) {
+    for (var photoId in photosWatched) {
+      var watchInfo = photosWatched[photoId];
       var timeNow = (new Date().getTime()) / 1000;
       var expirationTime = watchInfo['expirationTime'];
       if (expirationTime && expirationTime < timeNow) {
         // then we need to remove this item
-        delete(videosWatched[videoId]);
+        delete(photosWatched[photoId]);
       }
     }
 
-    return videosWatched;
+    return photosWatched;
   };
 
-  module.isVideoPage = function () {
-    return /\/videos\/(\d+)/.test(window.location.href);
+  module.isPhotoPage = function () {
+    return /.*\/photos\/.*/.test(window.location.href);
   };
 
   if (run_mode != false) {
-    if (module.isVideoPage()) {
+    if (module.isPhotoPage()) {
       module.run();
       setTimeout(function() {
         main.runOnUrlChange(module.run);

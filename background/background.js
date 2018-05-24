@@ -69,12 +69,14 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
   } else if (message.type === 'getEmailOrId') {
     sendResponse(localStorage.getItem('email_or_id'));
   } else if (
+    message.type === 'getPhotosWatched' ||
     message.type === 'getVideosWatched' ||
     message.type === 'getNewsRead'
   ) {
     var info = JSON.parse(localStorage.getItem(message.key) || '{}');
     sendResponse(info);
   } else if (
+    message.type === 'updatePhotosWatched' ||
     message.type === 'updateVideosWatched' ||
     message.type === 'updateNewsRead'
   ) {

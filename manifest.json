@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "IT40.com Extension",
   "description": "Browser extension for IT40.com",
-  "version": "1.0.40",
+  "version": "1.0.41",
   "background": {
     "scripts": [
       "background/background.js"
@@ -27,13 +27,15 @@
     {
       "matches": ["https://www.facebook.com/*", "http://www.facebook.com/*"],
       "js": [
-        "content/facebook.js"
+        "content/facebook.js",
+        "content/facebook-photos.js"
       ]
     },
     {
       "matches": ["https://www.instagram.com/*", "http://www.instagram.com/*"],
       "js": [
-        "content/instagram.js"
+        "content/instagram.js",
+        "content/instagram-photos.js"
       ]
     },
     {
