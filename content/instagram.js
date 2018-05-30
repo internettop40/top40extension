@@ -1,7 +1,7 @@
 var instagram = (function (run_mode = true) {
   var module = {
     apiData: {},
-    watchVideoInterval: 5000
+    watchVideoInterval: 1000
   };
 
   module.run = function () {

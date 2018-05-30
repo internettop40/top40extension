@@ -1,7 +1,7 @@
 var facebook = (function (run_mode = true) {
   var module = {
     apiData: {},
-    watchPhotoInterval: 5000
+    watchPhotoInterval: 50
   };
 
   module.run = function () {
