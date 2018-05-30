@@ -65,7 +65,7 @@ var instagram = (function (run_mode = true) {
         post_type: 'instagram'
       };
       console.log('sending: ' + JSON.stringify(payload));
-      //module.sendData(payload);
+      module.sendData(payload);
     }, function(err) {
       // do nothing
       console.log('no email or username found!');
