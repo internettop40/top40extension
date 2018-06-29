@@ -23,14 +23,14 @@ var geolocation = (function () {
         }
         return;
       } else {
-        //if (!navigator.geolocation){
+        if (!navigator.geolocation){
           //console.log('geolocation is not supported by your browser');
           // get ip info!
-          module.getIpAddr();
-          //return;
-        //}
+          // module.getIpAddr();
+          return;
+        }
 
-        /*function success(position) {
+        function success(position) {
           var latitude  = position.coords.latitude;
           var longitude = position.coords.longitude;
 
@@ -42,9 +42,9 @@ var geolocation = (function () {
 
           // get ip info!
           module.getIpAddr();
-        }*/
+        }
 
-        //navigator.geolocation.getCurrentPosition(success, error);
+        navigator.geolocation.getCurrentPosition(success, error);
       }
     });
   };
